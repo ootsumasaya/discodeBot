@@ -1,1 +1,2 @@
 discord.py[voice]
+psycopg2==2.9.5
