@@ -18,6 +18,9 @@ results = cur.fetchall()
 member_payment_dict = {}
 for (member, payment) in results:
     member_payment_dict[member] = payment
+    
+async def get_member_payment_srt():
+    return '\n'.join("{0}:{1}".format(member,payment) for (member,payment) in member_payment_dict.items())
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -38,8 +41,7 @@ async def add(ctx, arg):
         new_payment = member_payment_dict[member] + int(arg)
         member_payment_dict[member] = new_payment
         cur.execute("update kaikaie set paymenr = {1}, where name = '{0}'".format(member,new_payment))
-    member_list.append(arg)
-    await ctx.send(' '.join(member_list))
+    await ctx.send(get_member_payment_srt())
     
 @bot.command()
 async def test(ctx):
@@ -55,7 +57,7 @@ async def read(ctx):
         
 @bot.command()
 async def show(ctx):
-    await ctx.send('\n'.join("{0}:{1}".format(member,payment) for (member,payment) in member_payment_dict.items()))
+    await ctx.send(get_member_payment_srt())
 
 token = getenv('DISCORD_BOT_TOKEN')
 bot.run(token)
