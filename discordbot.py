@@ -39,7 +39,7 @@ async def add(ctx, arg):
     else:
         new_payment = member_payment_dict[member] + delta_payment
         member_payment_dict[member] = new_payment
-        cur.execute("update kaikaie set paymenr = {1}, where name = '{0}'".format(member,new_payment))
+        cur.execute("UPDATE kaikei SET payment = {1}, where name = '{0}'".format(member,new_payment))
     msg = '\n'.join("{0}:{1}".format(member,payment) for (member,payment) in member_payment_dict.items())
     await ctx.send(msg)
     
