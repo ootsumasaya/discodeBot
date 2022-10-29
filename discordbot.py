@@ -48,7 +48,7 @@ async def test(ctx):
     await ctx.send(ctx.author.name)
     
 @bot.command()
-async def read(ctx):
+async def reload(ctx):
     cur.execute("select * from kaikei")
     results = cur.fetchall()
     member_payment_dict = {}
