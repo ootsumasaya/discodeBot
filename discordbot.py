@@ -21,13 +21,13 @@ async def ping(ctx):
     await ctx.send('pong')
 
 @bot.command()
-async def add_user(ctx, arg):
-    member_list.add(arg)
+async def add_member(ctx, arg):
+    member_list.append(arg)
     await ctx.send(' '.join(member_list))
     
 
 @bot.command()
-async def show(ctx, arg):
+async def show(ctx):
     await ctx.send(' '.join(member_list))
 
 token = getenv('DISCORD_BOT_TOKEN')
