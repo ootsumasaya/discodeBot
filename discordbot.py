@@ -10,14 +10,11 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='/', intents=intents)
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
-conn = psycopg2.connect(DATABASE_URL)
-cur = conn.cursor()
-
-cur.execute("select * from kaikei")
-results = cur.fetchall()
-member_payment_dict = {}
-for (member, payment) in results:
-    member_payment_dict[member] = payment
+with psycopg2.connect(DATABASE_URL) as conn:
+    with conn.cursor() as curs:
+        member_payment_dict = {}
+        for (member, payment) in results:
+            member_payment_dict[member] = payment
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -35,11 +32,15 @@ async def add(ctx, arg):
     delta_payment = int(arg)
     if member not in member_payment_dict.keys():
         member_payment_dict[member] = delta_payment
-        cur.execute("INSERT INTO kaikei values ('{0}', {1})".format(member,delta_payment))
+        with psycopg2.connect(DATABASE_URL) as conn:
+            with conn.cursor() as curs:
+            cur.execute("INSERT INTO kaikei values ('{0}', {1})".format(member,delta_payment))
     else:
         new_payment = member_payment_dict[member] + delta_payment
         member_payment_dict[member] = new_payment
-        cur.execute("UPDATE kaikei SET payment = {1} where name = '{0}'".format(member,new_payment))
+        with psycopg2.connect(DATABASE_URL) as conn:
+            with conn.cursor() as curs:
+                cur.execute("UPDATE kaikei SET payment = {1} where name = '{0}'".format(member,new_payment))
     msg = '\n'.join("{0}:{1}".format(member,payment) for (member,payment) in member_payment_dict.items())
     await ctx.send(msg)
     
@@ -49,7 +50,9 @@ async def test(ctx):
     
 @bot.command()
 async def reload(ctx):
-    cur.execute("select * from kaikei")
+    with psycopg2.connect(DATABASE_URL) as conn:
+        with conn.cursor() as curs:
+            cur.execute("select * from kaikei")
     results = cur.fetchall()
     member_payment_dict = {}
     for (member, payment) in results:
