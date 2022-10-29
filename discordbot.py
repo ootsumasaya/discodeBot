@@ -31,14 +31,19 @@ async def ping(ctx):
 
 @bot.command()
 async def add(ctx, arg):
-    # member_payment_dict
-    # cur.execute(
+    member = str(ctx.author.name)
+    if member not in member_payment_dict.keys():
+        cur.execute("insert into kaikei {0} {1}").format(member,0)
+    else:
+        new_payment = int(member_payment_dict[member]) + int(arg)
+        member_payment_dict[member] = new_payment
+        cur.execute("update kaikaie set paymenr = {1}, where name = {0}".format(member,new_payment)
     member_list.append(arg)
     await ctx.send(' '.join(member_list))
     
 @bot.command()
-async def test(ctx,arg):
-    await ctx.send(ctx.author)
+async def test(ctx):
+    await ctx.send(ctx.author.name)
     
 @bot.command()
 async def read(ctx):
