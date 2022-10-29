@@ -11,7 +11,9 @@ bot = commands.Bot(command_prefix='/', intents=intents)
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 with psycopg2.connect(DATABASE_URL) as conn:
-    with conn.cursor() as curs:
+    with conn.cursor() as cur:
+        cur.execute("select * from kaikei")
+        results = cur.fetchall()
         member_payment_dict = {}
         for (member, payment) in results:
             member_payment_dict[member] = payment
@@ -33,13 +35,13 @@ async def add(ctx, arg):
     if member not in member_payment_dict.keys():
         member_payment_dict[member] = delta_payment
         with psycopg2.connect(DATABASE_URL) as conn:
-            with conn.cursor() as curs:
-            cur.execute("INSERT INTO kaikei values ('{0}', {1})".format(member,delta_payment))
+            with conn.cursor() as cur:
+                cur.execute("INSERT INTO kaikei values ('{0}', {1})".format(member,delta_payment))
     else:
         new_payment = member_payment_dict[member] + delta_payment
         member_payment_dict[member] = new_payment
         with psycopg2.connect(DATABASE_URL) as conn:
-            with conn.cursor() as curs:
+            with conn.cursor() as cur:
                 cur.execute("UPDATE kaikei SET payment = {1} where name = '{0}'".format(member,new_payment))
     msg = '\n'.join("{0}:{1}".format(member,payment) for (member,payment) in member_payment_dict.items())
     await ctx.send(msg)
@@ -51,9 +53,9 @@ async def test(ctx):
 @bot.command()
 async def reload(ctx):
     with psycopg2.connect(DATABASE_URL) as conn:
-        with conn.cursor() as curs:
+        with conn.cursor() as cur:
             cur.execute("select * from kaikei")
-    results = cur.fetchall()
+            results = cur.fetchall()
     member_payment_dict = {}
     for (member, payment) in results:
         member_payment_dict[member] = payment
