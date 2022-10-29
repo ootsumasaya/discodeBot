@@ -32,10 +32,12 @@ async def ping(ctx):
 @bot.command()
 async def add(ctx, arg):
     member = str(ctx.author.name)
+    delta_payment = int(arg)
     if member not in member_payment_dict.keys():
-        cur.execute("INSERT INTO kaikei values ('{0}', {1})".format(member,0))
+        member_payment_dict[member] = delta_payment
+        cur.execute("INSERT INTO kaikei values ('{0}', {1})".format(member,delta_payment))
     else:
-        new_payment = member_payment_dict[member] + int(arg)
+        new_payment = member_payment_dict[member] + delta_payment
         member_payment_dict[member] = new_payment
         cur.execute("update kaikaie set paymenr = {1}, where name = '{0}'".format(member,new_payment))
     msg = '\n'.join("{0}:{1}".format(member,payment) for (member,payment) in member_payment_dict.items())
